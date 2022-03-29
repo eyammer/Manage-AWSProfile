@@ -11,6 +11,7 @@ Use `Manage-AWSProfile` to set your current default aws config profile, unset th
 3. Add the following to your powershell profile (*the profile can be found by entering `$PROFILE` into your powershell prompt*).
 
 `. "<the path you noted in step 2>"`
+
 *Note: the "." in the preceding line is not a typo, it must be included*
 
 ## Usage
