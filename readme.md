@@ -1,6 +1,17 @@
 # Manage-AWSProfile
 
+## Description
+
 Use `Manage-AWSProfile` to set your current default aws config profile, unset the current default profile, show the current default profile, and list all available profiles.
+
+## Installation
+
+1. To install, clone this repository.
+2. Note the path Manage-AWSProfile.ps1
+3. Add the following to your powershell profile (*the profile can be found by entering `$PROFILE` into your powershell prompt*).
+
+`. "<the path you noted in step 2"`
+*Note: the "." in the preceding line is not a typo, it must be included*
 
 ## Usage
 
