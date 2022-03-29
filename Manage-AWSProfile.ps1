@@ -49,30 +49,40 @@ function Manage-AWSProfile {
         [string][Alias('P')]$ProfileName = "$($args[0])",
         [switch][Alias('U')]$Unset,
         [switch][Alias('L')]$List,
-        [switch][Alias('C')]$current
+        [switch][Alias('C')]$Current
     )
     if ($unset -and $ProfileName) {
         Write-Error "Can't use -ProfileName and -Unset together"
         Exit 1
     }
-        
+    if (-not ($ProfileName -or $List -or $Unset -or $Current)) {
+        Write-Output "Please choose profile:"
+        $i = 0
+        $profiles = Get-AWSProfile
+        foreach ($prof in ($profiles)){
+            $i += 1
+            Write-Output "$i`: $prof"
+        }
+        [int]$number = Read-Host "Press a number to select a profile"
+        Set-AWSProfile -p $profiles[$number - 1]
+    }
     if ($ProfileName) { Set-AWSProfile -p $ProfileName }
-    if ($List) { Get-AWSProfile }
+    if ($List) { Write-Output "`r`nAvailable Profiles:" $(Get-AWSProfile) }
     if ($Unset) { Clear-AWSProfile}
-    if ($current) { Show-AWSProfile }
+    if ($Current) { Show-AWSProfile }
 }
 function Set-AWSProfile {
     param(
-        [string][Alias('p')]$ProfileName = "$($args[0])"
+        [string][Alias('p')]$ProfileName
     )
     $available_profiles = Get-AWSProfile
         
-    if ($available_profile -eq $ProfileName) {
+    if ($available_profiles -contains $ProfileName) {
         $env:AWS_DEFAULT_PROFILE = $ProfileName
         $env:AWS_PROFILE = $ProfileName
         $env:AWS_EB_PROFILE = $ProfileName
             
-        Write-Output "AWS profile set to: " $ProfileName 
+        Write-Output "`r`nAWS profile set to: " $ProfileName 
            
     }
     else {   
@@ -93,8 +103,7 @@ function Get-AWSProfile {
         $path = $env:AWS_CONFIG_FILE
     } 
     if (-not  (Test-Path -Path $path) ) {
-        Write-Output "AWS config file not found at $path"
-        Remove-Variable -Scope global credentials_location
+        Write-Error "AWS config file not found at $path"
         Exit 1
     }
     $available_profiles = @()
@@ -108,7 +117,7 @@ function Get-AWSProfile {
 
 function Show-AWSProfile {
     if (-not ($env:AWS_EB_PROFILE -or $env:AWS_PROFILE -or $env:AWS_DEFAULT_PROFILE)) {
-        Write-Output "No AWS profile set."
+        Write-Output "`r`nNo AWS profile set."
     }
     if ($env:AWS_DEFAULT_PROFILE) { Write-Output "AWS_DEFAULT_PROFILE is set to $env:AWS_DEFAULT_PROFILE" } 
     if ($env:AWS_PROFILE) { Write-Output "AWS_PROFILE is set to $env:AWS_PROFILE" }
